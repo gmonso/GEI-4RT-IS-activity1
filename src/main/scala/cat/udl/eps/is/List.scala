@@ -60,12 +60,6 @@ object List {
       })
   }
 
-  // amb fold left
-  def digitsToNum(l: List[Int]): Int = {
-    foldLeft(l,""){ (acc, elem) =>
-      acc + elem
-    }.toInt
-  }
 
   // de forma numerica i sense fold
   def digitsToNum1(l: List[Int]): Int = {
@@ -75,6 +69,13 @@ object List {
         case Cons(head, tail) => acc + (head * scala.math.pow(10, i)).toInt + loop(acc, tail, i+1)
     }
     loop(0, reverse(l), 0)
+  }
+
+  // amb fold left
+  def digitsToNum(l: List[Int]): Int = {
+    foldLeft(l,""){ (acc, elem) =>
+      acc + elem
+    }.toInt
   }
 
   // sort una mica liat
@@ -106,50 +107,34 @@ object List {
   }
 
   // el sort definitiu
-  def sort[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
+  def sort11[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
     @tailrec
     def loop(l: List[A], acc: List[A]): List[A] = {
       l match
-        case Cons(head1: A, Cons(head2: A, tail2)) =>
+        case Cons(head1: A, Cons(head2: A, tail)) =>
           if ord(head1, head2) then
-            loop(Cons(head2, tail2), append(acc, Cons(head1, Nil)))
+            loop(Cons(head2, tail), mergeSorted(acc, Cons(head1, Nil))(ord))
           else
-            loop(Cons(head1, tail2), append(acc, Cons(head2, Nil)))
+            loop(Cons(head1, tail), mergeSorted(acc, Cons(head2, Nil))(ord))
         case Cons(head: A, Nil) =>
-          append(acc, Cons(head, Nil))
+          mergeSorted(acc, Cons(head, Nil))(ord)
         case _ => acc
     }
     loop(as, Nil)
   }
 
-  /*def sort[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
-    def loop(l: List[A], acc: List [A], mainHead: A|Boolean): List[A] = {
-      mainHead match
-        case Nil => {
-          l match
-            case Cons(head1: A, Cons(head2: A, tail2)) =>
-              if ord(head1, head2) then
-                append(acc, Cons(head1, Nil))
-              else
-                Cons(head2, Cons(head1, tail2))
-        }
-        case Cons(head,tail) => ???
+  def sort[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
+    @tailrec
+    def loop(l: List[A], acc: List[A]): List[A] = {
+      l match
+        case Cons(head: A, tail) =>
+            loop(tail, mergeSorted(Cons(head, Nil), acc)(ord))
+        case Cons(head: A, Nil) =>
+            mergeSorted(Cons(head, Nil), acc)(ord)
+        case _ => acc
     }
-    loop(as, (), false)
-  }*/
-
-  /*def sort1[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
-    foldLeft(as, ()){ (acc, elem) =>
-      elem match
-        //case Cons(head, Nil) => Cons(head, Nil)
-        case Cons(head1: A, Cons(head2: A, tail2)) =>
-          if ord(head1, head2) then
-            append(acc, Cons(head1, tail1))
-          else
-            append(acc, Cons(head1, tail1))
-
-    }
-  }*/
+    loop(as, Nil)
+  }
 
   def mergeSorted[A](l1: List[A], l2: List[A])(
     ord: (A, A) => Boolean
@@ -161,7 +146,7 @@ object List {
           if ord(head1, head2) then
             loop(tail1, tail2, append(acc, Cons(head1, Cons(head2, Nil))) )
           else
-            loop(tail1, tail2, append(acc, Cons(head2, Cons(head1, Nil))) )
+            loop(Cons(head1, tail1), tail2,append(acc, Cons(head2, Nil)) )
         case (Nil, Cons(head2, tail2)) => loop(Nil, tail2, append(acc, Cons(head2, Nil)))
         case (Cons(head1, tail1), Nil) => loop(tail1, Nil, append(acc, Cons(head1, Nil)))
         case (Nil, Nil) => acc
@@ -169,7 +154,15 @@ object List {
   }
 
   def checkSorted[A](as: List[A])(ord: (A, A) => Boolean): Boolean = {
-    ???
+    @tailrec
+    def loop(as: List[A], isSorted: Boolean): Boolean =
+      if (!isSorted) return false
+      as match
+        case Cons(head1, Cons(head2, tail2)) =>
+          loop(Cons(head2, tail2), ord(head1, head2))
+        case Cons(head, tail) =>
+          true
+    loop(as, true)
   }
 
   @tailrec
@@ -182,9 +175,7 @@ object List {
         else find(tail)(p)
   }
 
-  def partitionMap[A, B, C](
-                             l: List[A]
-                           )(p: A => Either[B, C]): (List[B], List[C]) = {
+  def partitionMap[A, B, C](l: List[A])(p: A => Either[B, C]): (List[B], List[C]) = {
     ???
   }
 
@@ -199,6 +190,14 @@ object List {
   }
 
   def digitsToNumEither(l: List[Int]): Either[Int, Int] = {
-    ???
+    foldLeft(l, Right(0) :Either[Int, Int]) { (acc, elem) =>
+      acc match
+        case Left(v) => acc
+        case Right(value) =>
+          if (elem.toString.length > 1) then
+            Left(elem)
+          else
+            Right(acc.getOrElse(0).toString.concat(elem.toString).toInt)
+    }
   }
 }

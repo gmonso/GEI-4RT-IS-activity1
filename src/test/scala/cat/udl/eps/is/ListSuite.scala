@@ -2,6 +2,7 @@ package cat.udl.eps.is
 
 import munit.FunSuite
 
+import List.*
 class ListSuite extends FunSuite {
 
   test("sort") {
@@ -22,7 +23,7 @@ class ListSuite extends FunSuite {
     assertEquals(digitsToNum(l), 1234)
   }
 
-  test("sort") {
+  test("sort-1") {
     val l = List(10, 7, 2, 3, 1, 4, 6, 5, 3, 2)
     assertEquals(sort(l)(_ <= _), List(1, 2, 2, 3, 3, 4, 5, 6, 7, 10))
     assertEquals(sort(l)(_ >= _), List(10, 7, 6, 5, 4, 3, 3, 2, 2, 1))
@@ -32,7 +33,7 @@ class ListSuite extends FunSuite {
     val sorted = List(1, 2, 3, 4, 5)
     val unsorted = List(1, 2, 4, 3, 5)
     assert(checkSorted(sorted)(_ <= _))
-    assert(!checkSorted(unsorted)(_ <= _))
+    assert( (!checkSorted(unsorted)(_ <= _)))
   }
 
   test("digitsToNumOption") {
@@ -60,11 +61,16 @@ class ListSuite extends FunSuite {
     val l1 = List(1, 3, 5)
     val l2 = List(2, 4, 6)
     val l2_extended = List(2, 4, 6, 7, 8,9,10,11)
+    val l3 = List(2)
+    val l4 = List(1,2,2,3)
+    val l5 = List(3)
+    val l6 = List(1, 2, 5, 7)
     assertEquals(mergeSorted(l1, Nil)(_ <= _), List(1,3,5))
     assertEquals(mergeSorted(Nil, l2)(_ <= _), List(2,4,6))
     assertEquals(mergeSorted(Nil, l2)(_ <= _), List(2,4,6))
     assertEquals(mergeSorted(l1, l2)(_ <= _), List(1, 2, 3, 4, 5, 6))
-    assertEquals(mergeSorted(l1, l2_extended)(_ <= _), List(1,2,3,4,5,6,7,8,9,10,11))
+    assertEquals(mergeSorted(l3, l4)(_ <= _), List(1,2,2,2,3))
+    assertEquals(mergeSorted(l5, l6)(_ <= _), List(1,2,3,5,7))
   }
 
 }
