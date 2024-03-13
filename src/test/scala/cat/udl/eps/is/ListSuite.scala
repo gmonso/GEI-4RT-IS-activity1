@@ -1,7 +1,6 @@
 package cat.udl.eps.is
 
 import munit.FunSuite
-import List.*
 
 class ListSuite extends FunSuite {
 
