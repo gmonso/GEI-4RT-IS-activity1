@@ -175,8 +175,19 @@ object List {
         else find(tail)(p)
   }
 
+
+
   def partitionMap[A, B, C](l: List[A])(p: A => Either[B, C]): (List[B], List[C]) = {
-    ???
+    (foldLeft(reverse(l), Nil: List[B]) { (acc, elem) =>
+      p(elem) match
+        case Left(l) => Cons(l, acc)
+        case Right(r) => acc
+    },
+      foldLeft(reverse(l), Nil: List[C]){ (acc, elem) =>
+        p(elem) match
+          case Left(l) => acc
+          case Right(r) => Cons(r, acc)
+      })
   }
 
   def digitsToNumOption(l: List[Int]): Option[Int] = {
