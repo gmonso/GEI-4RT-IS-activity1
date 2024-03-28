@@ -41,10 +41,20 @@ import scala.List
 object StdLib {
   
   def countLengths(words: List[String]): Map[Int, Int] = {
-    ???
+    words.groupMapReduce(_.length)((key) => 1)((count1, count2) => count1 + count2)
   }
 
   def sumFirstPowersOf(b: Int)(n: Int): Int = {
-    ???
+    def pow(b:Int, n: Int): Int = {
+      if (n-1 >= 0) {
+        pow(b, n - 1) * b
+      } else {
+        1
+      }
+    }
+    if n-1 >= 0 then
+      sumFirstPowersOf(b)(n-1) + pow(b, n-1)
+    else
+      0
   }
 }
