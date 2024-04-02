@@ -24,4 +24,27 @@ class HondtSuite extends FunSuite {
       
     assertEquals(Hondt.hondt(votes, n), result)
   }
+
+  test("test russia") {
+    val n: Int = 15
+    val votes: Map[String, Int] =
+      Map("putin" -> 1)
+    val result =
+      Map("putin" -> 15)
+
+    assertEquals(Hondt.hondt(votes, n), result)
+  }
+
+  test("test ager") {
+    val n: Int = 7
+    val votes: Map[String, Int] =
+      Map("CM-Junts" -> 219,
+        "IXA-Erc" -> 119,
+        "AXA-Nitupa" -> 43)
+    val result =
+      Map("CM-Junts" -> 5,
+        "IXA-Erc" -> 2)
+
+    assertEquals(Hondt.hondt(votes, n), result)
+  }
 }

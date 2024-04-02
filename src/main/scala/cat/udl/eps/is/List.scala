@@ -1,6 +1,7 @@
 package cat.udl.eps.is
 
 import scala.annotation.tailrec
+import scala.language.postfixOps
 
 // Exercises in user defined lists
 
@@ -62,7 +63,7 @@ object List {
 
 
   // de forma numerica i sense fold
-  def digitsToNum1(l: List[Int]): Int = {
+  def digitsToNum(l: List[Int]): Int = {
     def loop(acc: Int, l: List[Int], i: Int): Int = {
       l match
         case Nil => acc
@@ -71,8 +72,14 @@ object List {
     loop(0, reverse(l), 0)
   }
 
+  def digitsToNumFold(l: List[Int]): Int = {
+    foldLeft(reverse(l), (0, 0)) { (acc, elem) =>
+      (acc._1 + elem * scala.math.pow(10, acc._2).toInt, acc._2 + 1)
+    }._1
+  }
+
   // amb fold left
-  def digitsToNum(l: List[Int]): Int = {
+  def digitsToNumNoValid(l: List[Int]): Int = {
     foldLeft(l,""){ (acc, elem) =>
       acc + elem
     }.toInt

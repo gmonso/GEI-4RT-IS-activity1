@@ -27,7 +27,7 @@ object Hondt {
 
     // Per evitar problemes d'arrodoniments, hem de realitzar la divisió amb doubles.
     def quotients(nvotes: Int): List[Double] = {
-      (1 to seats).foldLeft(List())((acc, elem) => {  // recorrem els seients del 1 al seats i creem una llista de Double de la divisió del element del loop amb el num de vots passat per paràmetre.
+      (1 to seats).foldLeft(List())((acc: List[Double], elem) => {  // recorrem els seients del 1 al seats i creem una llista de Double de la divisió del element del loop amb el num de vots passat per paràmetre.
         acc.appended( nvotes.toDouble / elem.toDouble)
       })
     }
@@ -52,10 +52,14 @@ object Hondt {
     // Ara convertirem el Map anterior en una llista de parelles que contindrà
     // tots els valors de la taula (els quocients) amb el partit a que es corresponen.
     val allQuotients: List[(String, Double)] = {
-      quotientsByParty.foldLeft(List())((acc, elem) => {
+      /*quotientsByParty.foldLeft(List())((acc, elem) => {
         elem._2.foldLeft(List())((acc2, elem2)=>{
           acc.appended((elem._1, elem2))
         })
+      })*/
+
+      quotientsByParty.foldLeft(List(): List[(String, Double)])((acc, elem) => {
+        acc.appendedAll(distribute(elem))
       })
     }
 
@@ -63,7 +67,7 @@ object Hondt {
     // Pista: use sortBy i passeu una funció que, donada una parella retorna el
     // valor a considerar (com voleu ordenació decreixent. canvieu-li el signe)
     val sortedQuotients: List[(String, Double)] = {
-      allQuotients.sortBy((s) => (s._2))
+      allQuotients.sortBy((s) => (s._2)).reverse
     }
 
     // Agafem tants elements de la llista anterior com escons a repartir
@@ -72,6 +76,6 @@ object Hondt {
     }
 
     // I, finalment, comptem els partits a que corresponen aquests escons
-    ???
+    selected.groupMapReduce((partit, coeficient) => partit)(_ => 1)(_ + _)
   }
 }

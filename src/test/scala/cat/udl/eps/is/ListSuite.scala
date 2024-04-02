@@ -11,6 +11,26 @@ class ListSuite extends FunSuite {
     assertEquals(sort(l)(_ >= _), result)
   }
 
+  test("sort-1") {
+    val l = List(10, 7, 2, 3, 1, 4, 6, 5, 3, 2)
+    assertEquals(sort(l)(_ <= _), List(1, 2, 2, 3, 3, 4, 5, 6, 7, 10))
+    assertEquals(sort(l)(_ >= _), List(10, 7, 6, 5, 4, 3, 3, 2, 2, 1))
+  }
+
+  test("checkSorted") {
+    val sorted = List(1, 2, 3, 4, 5)
+    val unsorted = List(1, 2, 4, 3, 5)
+    assert(checkSorted(sorted)(_ <= _))
+    assert((!checkSorted(unsorted)(_ <= _)))
+  }
+
+  test("checkSorted-1") {
+    val sorted = List(1, 2, 3, 4, 5)
+    val unsorted = List(1, 2, 4, 3, 5)
+    assert(checkSorted(sorted)(_ <= _))
+    assert((!checkSorted(unsorted)(_ <= _)))
+  }
+
   test("partition") {
     val l = List(11, 22, 33, 44, 55)
     val (odds, evens) = partition(l)(_ % 2 == 1)
@@ -23,18 +43,17 @@ class ListSuite extends FunSuite {
     assertEquals(digitsToNum(l), 1234)
   }
 
-  test("sort-1") {
-    val l = List(10, 7, 2, 3, 1, 4, 6, 5, 3, 2)
-    assertEquals(sort(l)(_ <= _), List(1, 2, 2, 3, 3, 4, 5, 6, 7, 10))
-    assertEquals(sort(l)(_ >= _), List(10, 7, 6, 5, 4, 3, 3, 2, 2, 1))
+  test("digitsToNumFold empty") {
+    val l = List()
+    assertEquals(digitsToNum(l), 0)
   }
 
-  test("checkSorted") {
-    val sorted = List(1, 2, 3, 4, 5)
-    val unsorted = List(1, 2, 4, 3, 5)
-    assert(checkSorted(sorted)(_ <= _))
-    assert( (!checkSorted(unsorted)(_ <= _)))
+  test("digitsToNumFold") {
+    val l = List(1, 2, 3, 4)
+    assertEquals(digitsToNumFold(l), 1234)
   }
+
+
 
   test("digitsToNumOption") {
     val num = List(1, 2, 3, 4)

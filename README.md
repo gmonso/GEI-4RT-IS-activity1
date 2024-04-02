@@ -16,6 +16,11 @@ code .
 
 O, si volem usar l'IntelliJ, obrim el directori del projecte.
 
+Generar scaladocs:
+```bash
+scala-cli doc ./src/main/scala/cat/udl/eps/is/* -d ./ -f
+```
+
 ## Estructura de l'activitat
 
 L'activitat consta de diferents fitxers que tenen exercicis "paral·lels" als que hem fet, especialment del tema 4 (els temes anteriors són de conceptes inicials o presentació del llenguatge de programació)
