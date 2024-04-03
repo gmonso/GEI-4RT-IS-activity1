@@ -1,8 +1,8 @@
 package cat.udl.eps.is
 
+import cat.udl.eps.is.List.*
 import munit.FunSuite
 
-import List.*
 class ListSuite extends FunSuite {
 
   test("sort") {
@@ -31,28 +31,69 @@ class ListSuite extends FunSuite {
     assert((!checkSorted(unsorted)(_ <= _)))
   }
 
-  test("partition") {
+  test("partitionFoldLeft") {
     val l = List(11, 22, 33, 44, 55)
-    val (odds, evens) = partition(l)(_ % 2 == 1)
+    val (odds, evens) = partitionFoldLeft(l)(_ % 2 == 1)
     assertEquals(odds, List(11, 33, 55))
     assertEquals(evens, List(22, 44))
   }
 
-  test("digitsToNum") {
-    val l = List(1,2,3,4)
-    assertEquals(digitsToNum(l), 1234)
+  test("partitionFoldRight") {
+    val l = List(11, 22, 33, 44, 55)
+    val (odds, evens) = partitionFoldRight(l)(_ % 2 == 1)
+    assertEquals(odds, List(11, 33, 55))
+    assertEquals(evens, List(22, 44))
   }
 
-  test("digitsToNumFold empty") {
-    val l = List()
-    assertEquals(digitsToNum(l), 0)
+  test("partitionRecursive") {
+    val l = List(11, 22, 33, 44, 55)
+    val (odds, evens) = partitionRecursive(l)(_ % 2 == 1)
+    assertEquals(odds, List(11, 33, 55))
+    assertEquals(evens, List(22, 44))
   }
 
-  test("digitsToNumFold") {
+  test("partitionTailRecursive") {
+    val l = List(11, 22, 33, 44, 55)
+    val (odds, evens) = partitionTailRecursive(l)(_ % 2 == 1)
+    assertEquals(odds, List(11, 33, 55))
+    assertEquals(evens, List(22, 44))
+  }
+
+  test("digitsToNumRecursive") {
     val l = List(1, 2, 3, 4)
-    assertEquals(digitsToNumFold(l), 1234)
+    assertEquals(digitsToNumRecursive(l), 1234)
+    val l1 = List()
+    assertEquals(digitsToNumRecursive(l1), 0)
   }
 
+  test("digitsToNumTailRecursive") {
+    val l = List(1, 2, 3, 4)
+    assertEquals(digitsToNumTailRecursive(l), 1234)
+    val l1 = List()
+    assertEquals(digitsToNumTailRecursive(l1), 0)
+  }
+
+  test("digitsToNumFoldLeft") {
+    val l = List(1, 2, 3, 4)
+    assertEquals(digitsToNumFoldLeft(l), 1234)
+    val l1 = List()
+    assertEquals(digitsToNumFoldLeft(l1), 0)
+  }
+
+  test("digitsToNumFoldRight") {
+    val l = List(1, 2, 3, 4)
+    assertEquals(digitsToNumFoldRight(l), 1234)
+    val l1 = List()
+    assertEquals(digitsToNumFoldRight(l1), 0)
+  }
+
+
+  test("digitsToNumNoValidFirstImplement") {
+    val l = List(1, 2, 3, 4)
+    assertEquals(digitsToNumNoValidFirstImplement(l), 1234)
+    val l1 = List()
+    assertEquals(digitsToNumNoValidFirstImplement(l1), 0)
+  }
 
 
   test("digitsToNumOption") {
@@ -79,17 +120,17 @@ class ListSuite extends FunSuite {
   test("mergeSorted") {
     val l1 = List(1, 3, 5)
     val l2 = List(2, 4, 6)
-    val l2_extended = List(2, 4, 6, 7, 8,9,10,11)
+    val l2_extended = List(2, 4, 6, 7, 8, 9, 10, 11)
     val l3 = List(2)
-    val l4 = List(1,2,2,3)
+    val l4 = List(1, 2, 2, 3)
     val l5 = List(3)
     val l6 = List(1, 2, 5, 7)
-    assertEquals(mergeSorted(l1, Nil)(_ <= _), List(1,3,5))
-    assertEquals(mergeSorted(Nil, l2)(_ <= _), List(2,4,6))
-    assertEquals(mergeSorted(Nil, l2)(_ <= _), List(2,4,6))
+    assertEquals(mergeSorted(l1, Nil)(_ <= _), List(1, 3, 5))
+    assertEquals(mergeSorted(Nil, l2)(_ <= _), List(2, 4, 6))
+    assertEquals(mergeSorted(Nil, l2)(_ <= _), List(2, 4, 6))
     assertEquals(mergeSorted(l1, l2)(_ <= _), List(1, 2, 3, 4, 5, 6))
-    assertEquals(mergeSorted(l3, l4)(_ <= _), List(1,2,2,2,3))
-    assertEquals(mergeSorted(l5, l6)(_ <= _), List(1,2,3,5,7))
+    assertEquals(mergeSorted(l3, l4)(_ <= _), List(1, 2, 2, 2, 3))
+    assertEquals(mergeSorted(l5, l6)(_ <= _), List(1, 2, 3, 5, 7))
   }
 
 }
