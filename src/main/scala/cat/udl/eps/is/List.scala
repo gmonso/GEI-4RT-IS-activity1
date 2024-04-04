@@ -186,55 +186,14 @@ object List {
    * @return el valor del numero
    */
   def digitsToNumNoValidFirstImplement(l: List[Int]): Int = {
-    if l == Nil then return 0 /** si la llista es buida retornem 0 */
-    foldRight(l,""){ (elem, acc) => /** si no, fem un foldRight per concatenar els elements de la llista a un string */
-      elem + acc /** concatenem l'element amb l'acumulador */
-    }.toInt /** retornem el valor del string convertit a enter */
-  }
-
-  // sort una mica liat
-  def sort1[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
-    @tailrec
-    def loop(l: List[A], acc: List [A], mainHead: A|Boolean): List[A] = {
-      mainHead match
-        case false =>
-          l match
-            case Cons(head1: A, Cons(head2: A, tail2)) =>
-              if ord(head1, head2) then
-                loop(Cons(head2, tail2), append(acc, Cons(head1, Nil)), false)
-              else
-                loop(tail2, append(acc, Cons(head2, Nil)), head1)
-            case Cons(head: A, tail) =>
-              loop(tail, append(acc, Cons(head, Nil)), false)
-            case _ => acc
-        case mainHead:A =>
-          l match
-            case Cons(head: A, tail) =>
-              if ord( mainHead, head) then
-                loop(tail, append(acc, Cons(mainHead, Nil)), head)
-              else
-                loop(tail, append(acc, Cons(head, Nil)), mainHead)
-            case Nil => append(acc, Cons(mainHead, Nil))
-        case _ => acc
-    }
-    loop(as, Nil, false)
-  }
-
-  // el sort definitiu
-  def sort11[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
-    @tailrec
-    def loop(l: List[A], acc: List[A]): List[A] = {
-      l match
-        case Cons(head1: A, Cons(head2: A, tail)) =>
-          if ord(head1, head2) then
-            loop(Cons(head2, tail), mergeSorted(acc, Cons(head1, Nil))(ord))
-          else
-            loop(Cons(head1, tail), mergeSorted(acc, Cons(head2, Nil))(ord))
-        case Cons(head: A, Nil) =>
-          mergeSorted(acc, Cons(head, Nil))(ord)
-        case _ => acc
-    }
-    loop(as, Nil)
+    if l == Nil then return 0
+    /** si la llista es buida retornem 0 */
+    foldRight(l, "") { (elem, acc) =>
+      /** si no, fem un foldRight per concatenar els elements de la llista a un string */
+      elem + acc
+      /** concatenem l'element amb l'acumulador */
+    }.toInt
+    /** retornem el valor del string convertit a enter */
   }
 
   def sort[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
@@ -291,7 +250,7 @@ object List {
 
 
 
-  def partitionMap[A, B, C](l: List[A])(p: A => Either[B, C]): (List[B], List[C]) = {
+  def partitionMapFoldLeft[A, B, C](l: List[A])(p: A => Either[B, C]): (List[B], List[C]) = {
     (foldLeft(reverse(l), Nil: List[B]) { (acc, elem) =>
       p(elem) match
         case Left(l) => Cons(l, acc)
@@ -304,24 +263,82 @@ object List {
       })
   }
 
-  def digitsToNumOption(l: List[Int]): Option[Int] = {
-    foldLeft(l, Some(0)){(acc, elem) =>
-      if (acc.getOrElse(None) == None) then return None
-      if elem.toString.length > 1 then
+  def partitionMapFoldRight[A, B, C](l: List[A])(p: A => Either[B, C]): (List[B], List[C]) = {
+    (foldRight(l, Nil: List[B]) { (elem, acc) =>
+      p(elem) match
+        case Left(l) => Cons(l, acc)
+        case Right(r) => acc
+    },
+      foldRight(l, Nil: List[C]) { (elem, acc) =>
+        p(elem) match
+          case Left(l) => acc
+          case Right(r) => Cons(r, acc)
+      })
+  }
+
+  /**
+   * A partir d'una llista de digits, el convertirem a un enter amb foldLeft i string
+   * @param l la llista de digits
+   * @return el valor del numero
+   */
+  def digitsToNumOptionFoldLeft(l: List[Int]): Option[Int] = {
+    foldLeft(l, Some(0)){(acc, elem) => /** passem un acumulador de tipus Option amb Some(0) per poder retornar None si hi ha algun error */
+      if (acc.getOrElse(None) == None) then return None /** si l'acumulador es None, retornem None */
+      if elem.toString.length > 1 then /** si sol es un digit agafem l'acumulador i el concatenem i el convertim a numero*/
         return None
       else
         Some( acc.getOrElse(None).toString.concat(elem.toString).toInt)
     }
   }
 
-  def digitsToNumEither(l: List[Int]): Either[Int, Int] = {
+  /**
+   * A partir d'una llista de digits, el convertirem a un enter amb foldRight i string.
+   *
+   * @param l la llista de digits
+   * @return el valor del numero
+   */
+  def digitsToNumOptionFoldRight(l: List[Int]): Option[Int] = {
+    foldRight(reverse(l), Some(0)) { (elem, acc) => /** passem la llista reversada perque comencem pel final, i un acumulador de tipus Option amb Some(0) per poder retornar None si hi ha algun error */
+      if (acc.getOrElse(None) == None) then return None
+      if elem.toString.length > 1 then
+        return None
+      else /** si sol es un digit agafem l'acumulador i el concatenem i el convertim a numero */
+        Some(acc.getOrElse(None).toString.concat(elem.toString).toInt)
+    }
+  }
+
+  /**
+   * A partir d'una llista de digits, el convertirem a un enter amb foldLeft i Either.
+   *
+   * @param l la llista de digits
+   * @return el valor del numero a la dreta, o a l'esquerra si hi ha algun error i la posició de l'error.
+   */
+  def digitsToNumEitherFoldLeft(l: List[Int]): Either[Int, Int] = {
     foldLeft(l, Right(0) :Either[Int, Int]) { (acc, elem) =>
       acc match
-        case Left(v) => acc
+        case Left(v) => acc /** si l'acumulador es erroni (left) el retornem */
         case Right(value) =>
-          if (elem.toString.length > 1) then
+          if (elem.toString.length > 1) then /** si l'element no es un digit retornem error (left) amb valor de l'element */
             Left(elem)
-          else
+          else /** si sol es un digit agafem l'acumulador i el concatenem i el convertim a numero */
+            Right(acc.getOrElse(0).toString.concat(elem.toString).toInt)
+    }
+  }
+
+  /**
+   * A partir d'una llista de digits, el convertirem a un enter amb foldRight i Either.
+   *
+   * @param l la llista de digits
+   * @return el valor del numero a la dreta, o a l'esquerra si hi ha algun error i la posició de l'error.
+   */
+  def digitsToNumEitherFoldRight(l: List[Int]): Either[Int, Int] = {
+    foldRight(reverse(l), Right(0): Either[Int, Int]) { (elem, acc) =>
+      acc match
+        case Left(v) => acc /** si l'acumulador es erroni (left) el retornem */
+        case Right(value) =>
+          if (elem.toString.length > 1) then /** si l'element no es un digit retornem error (left) amb valor de l'element */
+            Left(elem)
+          else /** si no, afegim el digit al acumulador convertint amb int -> string -> int */
             Right(acc.getOrElse(0).toString.concat(elem.toString).toInt)
     }
   }
