@@ -14,6 +14,25 @@ class ListSuite extends FunSuite {
     assertEquals(sort(l1)(_ >= _), List(10, 7, 6, 5, 4, 3, 3, 2, 2, 1))
   }
 
+  test("sortFoldLeft") {
+    val l = Cons(3, Cons(1, Cons(2, Nil)))
+    val result = Cons(3, Cons(2, Cons(1, Nil)))
+    assertEquals(sortFoldLeft(l)(_ >= _), result)
+    val l1 = List(10, 7, 2, 3, 1, 4, 6, 5, 3, 2)
+    assertEquals(sortFoldLeft(l1)(_ <= _), List(1, 2, 2, 3, 3, 4, 5, 6, 7, 10))
+    assertEquals(sortFoldLeft(l1)(_ >= _), List(10, 7, 6, 5, 4, 3, 3, 2, 2, 1))
+  }
+
+  test("sortFoldRight") {
+    val l = Cons(3, Cons(1, Cons(2, Nil)))
+    val result = Cons(3, Cons(2, Cons(1, Nil)))
+    assertEquals(sortFoldRight(l)(_ >= _), result)
+    val l1 = List(10, 7, 2, 3, 1, 4, 6, 5, 3, 2)
+    assertEquals(sortFoldRight(l1)(_ <= _), List(1, 2, 2, 3, 3, 4, 5, 6, 7, 10))
+    assertEquals(sortFoldRight(l1)(_ >= _), List(10, 7, 6, 5, 4, 3, 3, 2, 2, 1))
+  }
+
+
   test("checkSorted") {
     val sorted = List(1, 2, 3, 4, 5)
     val unsorted = List(1, 2, 4, 3, 5)
