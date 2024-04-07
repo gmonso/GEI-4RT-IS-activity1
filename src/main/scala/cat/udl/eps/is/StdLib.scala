@@ -39,13 +39,24 @@ import scala.List
  */
 
 object StdLib {
-  
-  def countLengths(words: List[String]): Map[Int, Int] = {
+
+  /**
+   * A partir d'una llista de paraules, retorna un mapa on la clau es le numero de lletres i el valor es la quantitat de paraules que tenen aquesta longitud.
+   * @param words Llista de paraules
+   * @return Mapa amb la longitud de les paraules com a clau i la quantitat de paraules com a valor
+   */
+  def countLengths(words: List[String]): Map[Int, Int] = { /** a partir de la llista, fem un groupMapReduce, la clau serà la llargada de cada paraula, per cada paraula nomes incrementem 1, i a partir de dos elements del mapa, els sumem. */
     words.groupMapReduce(_.length)((key) => 1)((count1, count2) => count1 + count2)
   }
 
+  /**
+   * A partir d'un enter b, fem la seva potència n vegades amb una funcio auxiliar.
+   * @param b enter base
+   * @param n enter exponent
+   * @return sumatori de les potències de b des de 0 fins a n-1
+   */
   def sumFirstPowersOf(b: Int)(n: Int): Int = {
-    def pow(b:Int, n: Int): Int = {
+    def pow(b:Int, n: Int): Int = { /** Aquesta funcio retorna el resultat d'elevar b elevat a n */
       if (n-1 >= 0) {
         pow(b, n - 1) * b
       } else {
@@ -53,8 +64,8 @@ object StdLib {
       }
     }
     if n-1 >= 0 then
-      sumFirstPowersOf(b)(n-1) + pow(b, n-1)
+      sumFirstPowersOf(b)(n-1) + pow(b, n-1) /** Cridem a la funció ppal amb n-1 per fer totes les potències i sumem el valor de la n actual. */
     else
-      0
+      0 /** Si ja em fet tot el recorregut, retornem 0 */
   }
 }

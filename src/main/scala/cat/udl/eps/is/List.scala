@@ -196,6 +196,13 @@ object List {
     /** retornem el valor del string convertit a enter */
   }
 
+  /** Donada una llista de A's, i una funció que ens marca l'ordre entre dos A's, retorna la llista ordenada amb el mètode de mergesort i una funció auxiliar
+   *
+   * @param as la llista a ordenar
+   * @param ord la funció que ens diu si un element està ordenat sobre un altre.
+   * @tparam A el tipus de la llista
+   * @return la llista ordenada
+   */
   def sort[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
     @tailrec
     def loop(l: List[A], acc: List[A]): List[A] = {
@@ -209,23 +216,63 @@ object List {
     loop(as, Nil)
   }
 
+  /** Donada una llista de A's, i una funció que ens marca l'ordre entre dos A's, retorna la llista ordenada amb el mètode de mergesort i un foldLeft
+   *
+   * @param as  la llista a ordenar
+   * @param ord la funció que ens diu si un element està ordenat sobre un altre.
+   * @tparam A el tipus de la llista
+   * @return la llista ordenada
+   */
+  def sortFoldLeft[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
+    foldLeft(as, Nil: List[A])((acc, elem) =>
+      mergeSorted(Cons(elem, Nil), acc)(ord))
+  }
+
+
+  /** Donada una llista de A's, i una funció que ens marca l'ordre entre dos A's, retorna la llista ordenada amb el mètode de mergesort i un foldRight
+   *
+   * @param as  la llista a ordenar
+   * @param ord la funció que ens diu si un element està ordenat sobre un altre.
+   * @tparam A el tipus de la llista
+   * @return la llista ordenada
+   */
+  def sortFoldRight[A](as: List[A])(ord: (A, A) => Boolean): List[A] = {
+    foldRight(as, Nil: List[A])((elem, acc) =>
+      mergeSorted(Cons(elem, Nil), acc)(ord))
+  }
+
+  /**
+   * Donades dues llistes ordenades, les fusiona en una de ordenada amb una funció auxiliar.
+   * @param l1 la primera llista
+   * @param l2 la segona llista
+   * @param ord la funció que ens diu si un element està ordenat sobre un altre.
+   * @tparam A el tipus de la llista
+   * @return la llista ordenada
+   */
   def mergeSorted[A](l1: List[A], l2: List[A])(
     ord: (A, A) => Boolean
   ): List[A] = {
     @tailrec
     def loop(l1: List[A], l2: List[A], acc: List[A]): List[A] =
-      (l1,l2) match
-        case (Cons(head1, tail1), Cons(head2, tail2)) =>
-          if ord(head1, head2) then
+      (l1,l2) match /** una funcio que a partir de dues llistes i un acumulador ens retorna una llista ordenada */
+        case (Cons(head1, tail1), Cons(head2, tail2)) => /** agafem dos elements de la llista */
+          if ord(head1, head2) then /** si a través de la funció ord ens retorna cert, afegim a l'acumulaoor el primer element i crida revusriva. */
             loop(tail1, tail2, append(acc, Cons(head1, Cons(head2, Nil))) )
-          else
-            loop(Cons(head1, tail1), tail2,append(acc, Cons(head2, Nil)) )
-        case (Nil, Cons(head2, tail2)) => loop(Nil, tail2, append(acc, Cons(head2, Nil)))
-        case (Cons(head1, tail1), Nil) => loop(tail1, Nil, append(acc, Cons(head1, Nil)))
-        case (Nil, Nil) => acc
+          else /** sino, afegim l'altre element i crida recursiva */
+            loop(Cons(head1, tail1), tail2,append(acc, Cons(head2, Nil)) ) /**  */
+        case (Nil, Cons(head2, tail2)) => loop(Nil, tail2, append(acc, Cons(head2, Nil))) /** si la llista de la dreta es buida, afegim l'element de la dreta i crida recursiva */
+        case (Cons(head1, tail1), Nil) => loop(tail1, Nil, append(acc, Cons(head1, Nil))) /** si la llista de la dreta es buida, afegim l'element de l'esquerra i crida recursiva */
+        case (Nil, Nil) => acc /** si les dues llistes son buides retornem l'acumulador */
     loop(l1, l2, List(): List[A])
   }
 
+  /**
+   * Donada una llista de A's, una funció que a partir de dos A's que ens diu si està ordenats o no, retorna si està ordenada o no.
+   * @param as la llista a comprovar
+   * @param ord la funció que ens diu si un element està ordenat sobre un altre.
+   * @tparam A el tipus de la llista
+   * @return
+   */
   def checkSorted[A](as: List[A])(ord: (A, A) => Boolean): Boolean = {
     @tailrec
     def loop(as: List[A], isSorted: Boolean): Boolean =
@@ -238,6 +285,13 @@ object List {
     loop(as, true)
   }
 
+  /**
+   * Donada una llista de A's, una funció que retorna un boolean a partir d'un a, retorna el primer element que compleix la condició.
+   * @param l la llista a la que volem buscar de A's
+   * @param p la funció que ens retorna un booleà a partir d'un A
+   * @tparam A el tipus de la llista
+   * @return el primer element que compleix la condició en un Some(A) o si no None
+   */
   @tailrec
   def find[A](l: List[A])(p: A => Boolean): Option[A] = {
     l match
@@ -249,22 +303,40 @@ object List {
   }
 
 
-
+  /**
+   * Donada una llista de A's, una funció que retorna un Either, retorna una tupla amb dues llistes, la primera amb els elements que són Left i la segona amb els que són Right amb dos foldLeft.
+   * @param l la llista a la que volem partir
+   * @param p la funció que ens retorna un element de l'esquerra o a la de la dreta a partir d'un A.
+   * @tparam A el tipus de la llista
+   * @tparam B el tipus de la llista de l'esquerra
+   * @tparam C el tipus de la llista de la dreta
+   * @return una tupla amb dues llistes, la primera amb els elements que són Left i la segona amb els que són Right
+   */
   def partitionMapFoldLeft[A, B, C](l: List[A])(p: A => Either[B, C]): (List[B], List[C]) = {
-    (foldLeft(reverse(l), Nil: List[B]) { (acc, elem) =>
-      p(elem) match
+    (foldLeft(reverse(l), Nil: List[B]) { (acc, elem) => /** reversem la llista perque comencem pel final, i passem un acumulador de tipus List[B] */
+      p(elem) match /** si l'element es Left l'afegim a la llista de l'esquerra, sino no fem res i retornem el acc */
         case Left(l) => Cons(l, acc)
         case Right(r) => acc
     },
-      foldLeft(reverse(l), Nil: List[C]){ (acc, elem) =>
+      foldLeft(reverse(l), Nil: List[C]){ (acc, elem) => /** al reves que abans per discriminar l'altra llista */
         p(elem) match
           case Left(l) => acc
           case Right(r) => Cons(r, acc)
       })
   }
 
+  /**
+   * Donada una llista de A's, una funció que retorna un Either, retorna una tupla amb dues llistes, la primera amb els elements que són Left i la segona amb els que són Right amb dos foldRight.
+   *
+   * @param l la llista a la que volem partir
+   * @param p la funció que ens retorna un element de l'esquerra o a la de la dreta a partir d'un A.
+   * @tparam A el tipus de la llista
+   * @tparam B el tipus de la llista de l'esquerra
+   * @tparam C el tipus de la llista de la dreta
+   * @return una tupla amb dues llistes, la primera amb els elements que són Left i la segona amb els que són Right
+   */
   def partitionMapFoldRight[A, B, C](l: List[A])(p: A => Either[B, C]): (List[B], List[C]) = {
-    (foldRight(l, Nil: List[B]) { (elem, acc) =>
+    (foldRight(l, Nil: List[B]) { (elem, acc) => /** el mateix que abans pero sense reversar les llistes inicials. */
       p(elem) match
         case Left(l) => Cons(l, acc)
         case Right(r) => acc
